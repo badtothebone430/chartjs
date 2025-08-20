@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         SimCompanies Premium
 // @namespace    http://tampermonkey.net/
-// @version      3.5
+// @version      3.51
 // @description  Enhancements for SimCompanies web game. Complies with scripting rules of the game.
 // @author       Loki Clarke
 // @match        https://www.simcompanies.com/*
@@ -967,6 +967,7 @@ function handleWarehouseItem() {
         if (!storedChance || isNaN(storedChance)) {
             alert("Please visit the Executives page first to load the patent probability.");
             result.chance = 0.0625; // fallback base value
+            window.location.href = "https://www.simcompanies.com/headquarters/executives/";
         } else {
             result.chance = storedChance;
         }
