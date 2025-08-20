@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         SimCompanies Premium
 // @namespace    http://tampermonkey.net/
-// @version      3.4
+// @version      3.5
 // @description  Enhancements for SimCompanies web game. Complies with scripting rules of the game.
 // @author       Loki Clarke
 // @match        https://www.simcompanies.com/*
@@ -20,7 +20,7 @@
     "use strict";
 
     const CustomExchangeInputPrices = [10000]; // 交易所页面，自定义输入购买数量按钮
-    const CustomProductionTimeInputs = ["8am", "10pm", "6hr", "12hr","48hr","11am"]; // 生产页面，自定义输入生产时间按钮
+    const CustomProductionTimeInputs = ["9:15pm", "10pm", "6hr", "12hr","48hr","11am"]; // 生产页面，自定义输入生产时间按钮
     const ContractDiscount = 0.975; // 出售商品页面，合同MP价折扣
     let realCash = 0;
     let realPrice = 0;
@@ -90,6 +90,13 @@
             handleCustomButtonForOtherPage();
         } else if (currentURL.includes("/b/")) {
             handleCustomHourInput();
+        } else if (currentURL.includes("/headquarters/executives/")) {
+            // On the probability page
+            const patentChance = getPatentProbability(); // from previous function
+            if (patentChance !== null) {
+                localStorage.setItem("patentProbability", patentChance);
+            }
+
         } else if (currentURL.includes("/market/resource/")) {
             // 交易所 高亮6件最近访问物品
             handleExchangeHighlightRecent();
@@ -956,6 +963,16 @@ function handleWarehouseItem() {
     const timer = setInterval(() => {
         const result = { patents: 0, total: 0, progress: 0, exchangeValue: null, itemId: null, chance: 0.1019 };
 
+        const storedChance = parseFloat(localStorage.getItem("patentProbability"));
+        if (!storedChance || isNaN(storedChance)) {
+            alert("Please visit the Executives page first to load the patent probability.");
+            result.chance = 0.0625; // fallback base value
+        } else {
+            result.chance = storedChance;
+        }
+
+
+
         const patentTextEl = document.querySelector(".css-170aqo5.e1htbz258");
         const buyMoreEl = document.querySelector('a[href^="/market/resource/"]');
         const inputEl = document.querySelector(`input.form-control[name="amount"]`);
@@ -979,11 +996,20 @@ function handleWarehouseItem() {
         const priceMatch = buyMoreEl.textContent.match(/\(\$([\d.,]+)\)/);
         if (!priceMatch) return; // wait until price text exists
         result.exchangeValue = Number(priceMatch[1].replace(/,/g, ""));
+        result.exchangeValue *= 1.00259235256;
 
         // --- Item ID ---
         const hrefMatch = buyMoreEl.getAttribute("href").match(/\/market\/resource\/(\d+)\//);
         if (!hrefMatch) return;
         result.itemId = parseInt(hrefMatch[1], 10);
+
+        const cashElem = document.querySelector('.css-q2xpdd');
+            if (cashElem) {
+                const cash = cashElem.textContent.trim();
+                realCash = parseFloat(cash.replace('$','').replace(/,/g,'').trim());
+                console.log(realCash);
+            }
+
 
         // Clear interval since all data is ready
         clearInterval(timer);
@@ -1010,6 +1036,17 @@ function handleWarehouseItem() {
             113: 1800,  // Materials
             145: 1728   // Recipes
         };
+
+        // --- Add title bar ---
+        const titleBar = document.createElement("div");
+        titleBar.textContent = "Executive Bypass";
+        titleBar.style.fontWeight = "bold";
+        titleBar.style.fontSize = "16px";
+        titleBar.style.textAlign = "center";
+        titleBar.style.marginBottom = "10px";
+        inputEl.parentElement.insertBefore(titleBar, inputEl);
+
+
         // (Patent Progress, Research Needed, Cash Needed, Patent Conversion)
 
 
@@ -1051,7 +1088,7 @@ function handleWarehouseItem() {
 
         // --- Add note at bottom ---
         const note = document.createElement("div");
-        note.textContent = "All of these calculations are estimates. They may vary.";
+        note.textContent = "All of these calculations are estimates. They may vary. If you have executives, visit the Executives page then return here.";
         note.style.fontSize = "12px";
         note.style.fontStyle = "italic";
         note.style.marginTop = "10px";
@@ -1060,6 +1097,29 @@ function handleWarehouseItem() {
         return result;
 
     }, 100); // check every 100ms until all elements and price exist
+}
+
+
+function getPatentProbability() {
+    const rows = document.querySelectorAll("table.css-105i9tf.ewa4lx20 tbody tr");
+    for (const row of rows) {
+        const label = row.querySelector("td:first-child")?.textContent?.trim();
+        if (label === "Patent probability") {
+            const valueText = row.querySelector("td:last-child")?.textContent?.trim();
+            if (!valueText) return null;
+
+            // Match both numbers in the cell (e.g., "6.25% +3.94%")
+            const matches = [...valueText.matchAll(/([\d.]+)%?/g)];
+            if (matches.length === 0) return null;
+
+            // Sum all percentages found
+            let sum = 0;
+            matches.forEach(m => sum += parseFloat(m[1]));
+            console.log(sum);
+            return sum / 100; // convert to decimal
+        }
+    }
+    return null;
 }
 
 
