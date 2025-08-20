@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         SimCompanies Premium
 // @namespace    http://tampermonkey.net/
-// @version      3.3
+// @version      3.4
 // @description  Enhancements for SimCompanies web game. Complies with scripting rules of the game.
 // @author       Loki Clarke
 // @match        https://www.simcompanies.com/*
@@ -13,6 +13,7 @@
 // @run-at       document-start
 // @license MIT
 
+// @downloadURL none
 // ==/UserScript==
 
 (function () {
@@ -85,6 +86,8 @@
         ) {
             flag = 0;
             handleWarehouseItem();
+        } else if (/\/headquarters\/warehouse\/research\/.+/.test(currentURL)) {
+            handleCustomButtonForOtherPage();
         } else if (currentURL.includes("/b/")) {
             handleCustomHourInput();
         } else if (currentURL.includes("/market/resource/")) {
@@ -947,6 +950,119 @@ function handleWarehouseItem() {
     function numberAddCommas(x) {
         return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
     }
+
+    // Hollow function for a different page, similar structure to handleExchangeCustomInputPrices
+    function handleCustomButtonForOtherPage() {
+    const timer = setInterval(() => {
+        const result = { patents: 0, total: 0, progress: 0, exchangeValue: null, itemId: null, chance: 0.1019 };
+
+        const patentTextEl = document.querySelector(".css-170aqo5.e1htbz258");
+        const buyMoreEl = document.querySelector('a[href^="/market/resource/"]');
+        const inputEl = document.querySelector(`input.form-control[name="amount"]`);
+
+        // Wait until necessary elements exist
+        if (!patentTextEl || !buyMoreEl || !inputEl) return;
+
+        // --- Patents ---
+        const match = patentTextEl.textContent.match(/([\d,]+)\s+patents\s+out\s+of\s+([\d,]+)/);
+        if (!match) return;
+
+        const patents = parseInt(match[1].replace(/,/g, ""), 10);
+        const total = parseInt(match[2].replace(/,/g, ""), 10);
+        const progress = total > 0 ? (patents / total) * 100 : 0;
+
+        result.patents = patents;
+        result.total = total;
+        result.progress = progress;
+
+        // --- Exchange value ---
+        const priceMatch = buyMoreEl.textContent.match(/\(\$([\d.,]+)\)/);
+        if (!priceMatch) return; // wait until price text exists
+        result.exchangeValue = Number(priceMatch[1].replace(/,/g, ""));
+
+        // --- Item ID ---
+        const hrefMatch = buyMoreEl.getAttribute("href").match(/\/market\/resource\/(\d+)\//);
+        if (!hrefMatch) return;
+        result.itemId = parseInt(hrefMatch[1], 10);
+
+        // Clear interval since all data is ready
+        clearInterval(timer);
+
+        // --- Format numbers with commas ---
+        const progressFormatted = progress.toFixed(2).toLocaleString();
+        const require = ((total - patents) / result.chance).toFixed(0);
+        const requireFormatted = Number(require).toLocaleString();
+        const cashNeeded = (require * result.exchangeValue).toFixed(2);
+        const cashNeededFormatted = Number(cashNeeded).toLocaleString();
+
+        // --- Patent value dictionary ---
+        const patentValueDict = {
+            29: 1368,   // Plant
+            30: 2160,   // Energy
+            31: 2160,   // Mining
+            32: 2592,   // Electronics
+            33: 1584,   // Breeding
+            34: 1296,   // Chemistry
+            35: 1260,   // Software
+            58: 1440,   // Automotive
+            59: 720,    // Fashion
+            100: 2440.8,// Aerospace
+            113: 1800,  // Materials
+            145: 1728   // Recipes
+        };
+        // (Patent Progress, Research Needed, Cash Needed, Patent Conversion)
+
+
+        // --- Patent Conversion ---
+        const x = patentValueDict[result.itemId] || 0;
+        console.log("require: ",require);
+        console.log("cashNeeded: ",cashNeeded);
+        const patentConversion = ((total-patents) * x) - cashNeeded;
+        const patentConversionFormatted = Number(patentConversion).toLocaleString();
+
+        // --- Display progress ---
+        const b = document.createElement("b");
+        b.textContent = `Patent Progress: %${progressFormatted}`;
+        b.style.padding = '10px 5px';
+        b.style.display = 'block';
+        inputEl.parentElement.appendChild(b);
+
+        // --- Display research needed ---
+        const b2 = document.createElement("b");
+        b2.textContent = `Research Needed: ${requireFormatted}`;
+        b2.style.padding = '10px 5px';
+        b2.style.display = 'block';
+        inputEl.parentElement.appendChild(b2);
+
+        // --- Display cash needed ---
+        const b3 = document.createElement("b");
+        b3.textContent = `Cash Needed: $${cashNeededFormatted}`;
+        b3.style.padding = '10px 5px';
+        b3.style.display = 'block';
+        inputEl.parentElement.appendChild(b3);
+
+        // --- Display patent conversion ---
+        const b4 = document.createElement("b");
+        b4.textContent = `Patent Conversion: $${patentConversionFormatted}`;
+        b4.style.padding = '10px 5px';
+        b4.style.display = 'block';
+        b4.style.color = patentConversion >= 0 ? 'green' : 'red';
+        inputEl.parentElement.appendChild(b4);
+
+        // --- Add note at bottom ---
+        const note = document.createElement("div");
+        note.textContent = "All of these calculations are estimates. They may vary.";
+        note.style.fontSize = "12px";
+        note.style.fontStyle = "italic";
+        note.style.marginTop = "10px";
+        inputEl.parentElement.appendChild(note);
+
+        return result;
+
+    }, 100); // check every 100ms until all elements and price exist
+}
+
+
 
     function auction() {
         const timer = setInterval (() => {
