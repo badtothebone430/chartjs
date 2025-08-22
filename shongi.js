@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         SimCompanies Premium
 // @namespace    http://tampermonkey.net/
-// @version      3.51
+// @version      3.53
 // @description  Enhancements for SimCompanies web game. Complies with scripting rules of the game.
 // @author       Loki Clarke
 // @match        https://www.simcompanies.com/*
@@ -13,7 +13,6 @@
 // @run-at       document-start
 // @license MIT
 
-// @downloadURL none
 // ==/UserScript==
 
 (function () {
@@ -479,67 +478,67 @@
         let timer = setInterval(checkElementExist, 100);
     }
 
-function handleWarehouseItem() {
-  const timer = setInterval(() => {
-      clearInterval(timer); // Elements found—stop polling
-    const input = document.querySelector('input.form-control[name="price"]');
-    const priceElement = document.querySelector('.css-rnnx2x');
-    const classArr = Array.from(document.querySelectorAll('.css-14is9qy'));
+    function handleWarehouseItem() {
+        const timer = setInterval(() => {
+            clearInterval(timer); // Elements found—stop polling
+            const input = document.querySelector('input.form-control[name="price"]');
+            const priceElement = document.querySelector('.css-rnnx2x');
+            const classArr = Array.from(document.querySelectorAll('.css-14is9qy'));
 
-    if (!input || !priceElement || classArr.length < 2) return;
+            if (!input || !priceElement || classArr.length < 2) return;
 
 
 
-    const price = parseFloat(priceElement.nextSibling?.nextSibling?.textContent?.trim().replace(',', ''))?.toFixed(3);
-    const source = parseFloat(classArr[1].textContent.trim().replace('$','').replace(',','')).toFixed(3);
-    const amount = parseInt(classArr[0].textContent.trim().replace(',',''));
+            const price = parseFloat(priceElement.nextSibling?.nextSibling?.textContent?.trim().replace(',', ''))?.toFixed(3);
+            const source = parseFloat(classArr[1].textContent.trim().replace('$','').replace(',','')).toFixed(3);
+            const amount = parseInt(classArr[0].textContent.trim().replace(',',''));
 
-    console.log(`${price} ${source} ${amount}`);
-    if(!flag){
-    console.log(flag);
-    const a = document.createElement('a');
-        a.textContent = 'MP: $'+ price;
-        a.style.display = "block";
-        a.onclick = () => {setInput(input, price);}
-        input.parentElement.appendChild(a);
-        const a2 = document.createElement('a');
-        a2.textContent = '2.5%: $'+ price*ContractDiscount;
-        a2.style.display = "block";
-        a2.onclick = () => {setInput(input, price*ContractDiscount);}
-        input.parentElement.appendChild(a2);
-        const span = document.createElement('span');
-        const exchangeVal = (price*amount).toFixed(3);
-        span.textContent = "Exchange Value: $"+exchangeVal;
-        span.style.fontSize = "16px";
-        span.style.padding = "10px 5px";
-        span.style.display = "block";
-        span.style.background = '#FFC107';
-        span.style.border = '1px solid white';
-        classArr[1].parentElement.appendChild(span);
-        const span4 = document.createElement('span');
-        span4.textContent = "Contract Value: $"+(price*amount*ContractDiscount).toFixed(3);
-        span4.style.fontSize = "16px";
-        span4.style.display = "block";
-        classArr[1].parentElement.appendChild(span4);
-        const span2 = document.createElement('span');
-        span2.textContent = "Total Cost: $"+(source*amount).toFixed(3);
-        span2.style.fontSize = "16px";
-        span2.style.display = "block";
-        classArr[1].parentElement.appendChild(span2);
-        const span3 = document.createElement('span');
-        const profitLow = ((price-source)*amount*.96).toFixed(3);
-        const profitHigh = ((price-source)*amount*ContractDiscount).toFixed(3);
-        const profitMargin = (profitLow/exchangeVal*100).toFixed(1);
-        span3.textContent = "Profit Range: $"+profitLow+" - $"+profitHigh+`‎ ‎ ‎ ‎ (% ${profitMargin} Profit)`;
-        span3.style.fontSize = "16px";
-        span3.style.display = "block";
-        classArr[1].parentElement.appendChild(span3);
+            console.log(`${price} ${source} ${amount}`);
+            if(!flag){
+                console.log(flag);
+                const a = document.createElement('a');
+                a.textContent = 'MP: $'+ price;
+                a.style.display = "block";
+                a.onclick = () => {setInput(input, price);}
+                input.parentElement.appendChild(a);
+                const a2 = document.createElement('a');
+                a2.textContent = '2.5%: $'+ price*ContractDiscount;
+                a2.style.display = "block";
+                a2.onclick = () => {setInput(input, price*ContractDiscount);}
+                input.parentElement.appendChild(a2);
+                const span = document.createElement('span');
+                const exchangeVal = (price*amount).toFixed(3);
+                span.textContent = "Exchange Value: $"+exchangeVal;
+                span.style.fontSize = "16px";
+                span.style.padding = "10px 5px";
+                span.style.display = "block";
+                span.style.background = '#FFC107';
+                span.style.border = '1px solid white';
+                classArr[1].parentElement.appendChild(span);
+                const span4 = document.createElement('span');
+                span4.textContent = "Contract Value: $"+(price*amount*ContractDiscount).toFixed(3);
+                span4.style.fontSize = "16px";
+                span4.style.display = "block";
+                classArr[1].parentElement.appendChild(span4);
+                const span2 = document.createElement('span');
+                span2.textContent = "Total Cost: $"+(source*amount).toFixed(3);
+                span2.style.fontSize = "16px";
+                span2.style.display = "block";
+                classArr[1].parentElement.appendChild(span2);
+                const span3 = document.createElement('span');
+                const profitLow = ((price-source)*amount*.96).toFixed(3);
+                const profitHigh = ((price-source)*amount*ContractDiscount).toFixed(3);
+                const profitMargin = (profitLow/exchangeVal*100).toFixed(1);
+                span3.textContent = "Profit Range: $"+profitLow+" - $"+profitHigh+`‎ ‎ ‎ ‎ (% ${profitMargin} Profit)`;
+                span3.style.fontSize = "16px";
+                span3.style.display = "block";
+                classArr[1].parentElement.appendChild(span3);
 
-        flag=1;
-        console.log(flag);
+                flag=1;
+                console.log(flag);
+            }
+        }, 100);
     }
-  }, 100);
-}
 
     /*function handleWarehouseItem() {
         const checkElementExist = () => {
@@ -960,51 +959,51 @@ function handleWarehouseItem() {
 
     // Hollow function for a different page, similar structure to handleExchangeCustomInputPrices
     function handleCustomButtonForOtherPage() {
-    const timer = setInterval(() => {
-        const result = { patents: 0, total: 0, progress: 0, exchangeValue: null, itemId: null, chance: 0.1019 };
+        const timer = setInterval(() => {
+            const result = { patents: 0, total: 0, progress: 0, exchangeValue: null, itemId: null, chance: 0.0625 };
 
-        const storedChance = parseFloat(localStorage.getItem("patentProbability"));
-        if (!storedChance || isNaN(storedChance)) {
-            alert("Please visit the Executives page first to load the patent probability.");
-            result.chance = 0.0625; // fallback base value
-            window.location.href = "https://www.simcompanies.com/headquarters/executives/";
-        } else {
-            result.chance = storedChance;
-        }
+            const storedChance = parseFloat(localStorage.getItem("patentProbability"));
+            if (!storedChance || isNaN(storedChance)) {
+                alert("Please visit the Executives page first to load the patent probability.");
+                result.chance = 0.0625; // fallback base value
+                window.location.href = "https://www.simcompanies.com/headquarters/executives/";
+            } else {
+                result.chance = storedChance;
+            }
 
 
 
-        const patentTextEl = document.querySelector(".css-170aqo5.e1htbz258");
-        const buyMoreEl = document.querySelector('a[href^="/market/resource/"]');
-        const inputEl = document.querySelector(`input.form-control[name="amount"]`);
+            const patentTextEl = document.querySelector(".css-170aqo5.e1htbz258");
+            const buyMoreEl = document.querySelector('a[href^="/market/resource/"]');
+            const inputEl = document.querySelector(`input.form-control[name="amount"]`);
 
-        // Wait until necessary elements exist
-        if (!patentTextEl || !buyMoreEl || !inputEl) return;
+            // Wait until necessary elements exist
+            if (!patentTextEl || !buyMoreEl || !inputEl) return;
 
-        // --- Patents ---
-        const match = patentTextEl.textContent.match(/([\d,]+)\s+patents\s+out\s+of\s+([\d,]+)/);
-        if (!match) return;
+            // --- Patents ---
+            const match = patentTextEl.textContent.match(/([\d,]+)\s+patents\s+out\s+of\s+([\d,]+)/);
+            if (!match) return;
 
-        const patents = parseInt(match[1].replace(/,/g, ""), 10);
-        const total = parseInt(match[2].replace(/,/g, ""), 10);
-        const progress = total > 0 ? (patents / total) * 100 : 0;
+            const patents = parseInt(match[1].replace(/,/g, ""), 10);
+            const total = parseInt(match[2].replace(/,/g, ""), 10);
+            const progress = total > 0 ? (patents / total) * 100 : 0;
 
-        result.patents = patents;
-        result.total = total;
-        result.progress = progress;
+            result.patents = patents;
+            result.total = total;
+            result.progress = progress;
 
-        // --- Exchange value ---
-        const priceMatch = buyMoreEl.textContent.match(/\(\$([\d.,]+)\)/);
-        if (!priceMatch) return; // wait until price text exists
-        result.exchangeValue = Number(priceMatch[1].replace(/,/g, ""));
-        result.exchangeValue *= 1.00259235256;
+            // --- Exchange value ---
+            const priceMatch = buyMoreEl.textContent.match(/\(\$([\d.,]+)\)/);
+            if (!priceMatch) return; // wait until price text exists
+            result.exchangeValue = Number(priceMatch[1].replace(/,/g, ""));
+            result.exchangeValue *= 1.00259235256;
 
-        // --- Item ID ---
-        const hrefMatch = buyMoreEl.getAttribute("href").match(/\/market\/resource\/(\d+)\//);
-        if (!hrefMatch) return;
-        result.itemId = parseInt(hrefMatch[1], 10);
+            // --- Item ID ---
+            const hrefMatch = buyMoreEl.getAttribute("href").match(/\/market\/resource\/(\d+)\//);
+            if (!hrefMatch) return;
+            result.itemId = parseInt(hrefMatch[1], 10);
 
-        const cashElem = document.querySelector('.css-q2xpdd');
+            const cashElem = document.querySelector('.css-q2xpdd');
             if (cashElem) {
                 const cash = cashElem.textContent.trim();
                 realCash = parseFloat(cash.replace('$','').replace(/,/g,'').trim());
@@ -1012,129 +1011,137 @@ function handleWarehouseItem() {
             }
 
 
-        // Clear interval since all data is ready
-        clearInterval(timer);
+            // Clear interval since all data is ready
+            clearInterval(timer);
 
-        // --- Format numbers with commas ---
-        const progressFormatted = progress.toFixed(2).toLocaleString();
-        const require = ((total - patents) / result.chance).toFixed(0);
-        const requireFormatted = Number(require).toLocaleString();
-        const cashNeeded = (require * result.exchangeValue).toFixed(2);
-        const cashNeededFormatted = Number(cashNeeded).toLocaleString();
+            // --- Format numbers with commas ---
+            const progressFormatted = progress.toFixed(2).toLocaleString();
+            //const progressFormatted = Number(result.progress.toFixed(2)).toLocaleString();
 
-        // --- Patent value dictionary ---
-        const patentValueDict = {
-            29: 1368,   // Plant
-            30: 2160,   // Energy
-            31: 2160,   // Mining
-            32: 2592,   // Electronics
-            33: 1584,   // Breeding
-            34: 1296,   // Chemistry
-            35: 1260,   // Software
-            58: 1440,   // Automotive
-            59: 720,    // Fashion
-            100: 2440.8,// Aerospace
-            113: 1800,  // Materials
-            145: 1728   // Recipes
-        };
+            const require = ((total - patents) / result.chance).toFixed(0);
+            const requireFormatted = Number(require).toLocaleString();
+            const cashNeeded = (require * result.exchangeValue).toFixed(2);
+            const cashNeededFormatted = Number(cashNeeded).toLocaleString();
 
-        // --- Add title bar ---
-        const titleBar = document.createElement("div");
-        titleBar.textContent = "Executive Bypass";
-        titleBar.style.fontWeight = "bold";
-        titleBar.style.fontSize = "16px";
-        titleBar.style.textAlign = "center";
-        titleBar.style.marginBottom = "10px";
-        inputEl.parentElement.insertBefore(titleBar, inputEl);
+            // --- Patent value dictionary ---
+            const patentValueDict = {
+                29: 1368,   // Plant
+                30: 2160,   // Energy
+                31: 2160,   // Mining
+                32: 2592,   // Electronics
+                33: 1584,   // Breeding
+                34: 1296,   // Chemistry
+                35: 1260,   // Software
+                58: 1440,   // Automotive
+                59: 720,    // Fashion
+                100: 2440.8,// Aerospace
+                113: 1800,  // Materials
+                145: 1728   // Recipes
+            };
 
-
-        // (Patent Progress, Research Needed, Cash Needed, Patent Conversion)
-
-
-        // --- Patent Conversion ---
-        const x = patentValueDict[result.itemId] || 0;
-        console.log("require: ",require);
-        console.log("cashNeeded: ",cashNeeded);
-        const patentConversion = ((total-patents) * x) - cashNeeded;
-        const patentConversionFormatted = Number(patentConversion).toLocaleString();
-
-        // --- Display progress ---
-        const b = document.createElement("b");
-        b.textContent = `Patent Progress: %${progressFormatted}`;
-        b.style.padding = '10px 5px';
-        b.style.display = 'block';
-        inputEl.parentElement.appendChild(b);
-
-        // --- Display research needed ---
-        const b2 = document.createElement("b");
-        b2.textContent = `Research Needed: ${requireFormatted}`;
-        b2.style.padding = '10px 5px';
-        b2.style.display = 'block';
-        inputEl.parentElement.appendChild(b2);
-
-        // --- Display cash needed ---
-        const b3 = document.createElement("b");
-        b3.textContent = `Cash Needed: $${cashNeededFormatted}`;
-        b3.style.padding = '10px 5px';
-        b3.style.display = 'block';
-        inputEl.parentElement.appendChild(b3);
-
-        // --- Display patent conversion ---
-        const b4 = document.createElement("b");
-        b4.textContent = `Patent Conversion: $${patentConversionFormatted}`;
-        b4.style.padding = '10px 5px';
-        b4.style.display = 'block';
-        b4.style.color = patentConversion >= 0 ? 'green' : 'red';
-        inputEl.parentElement.appendChild(b4);
-
-        // --- Add note at bottom ---
-        const note = document.createElement("div");
-        note.textContent = "All of these calculations are estimates. They may vary. If you have executives, visit the Executives page then return here.";
-        note.style.fontSize = "12px";
-        note.style.fontStyle = "italic";
-        note.style.marginTop = "10px";
-        inputEl.parentElement.appendChild(note);
-
-        return result;
-
-    }, 100); // check every 100ms until all elements and price exist
-}
+            // --- Add title bar ---
+            const titleBar = document.createElement("div");
+            titleBar.textContent = "Executive Bypass";
+            titleBar.style.fontWeight = "bold";
+            titleBar.style.fontSize = "16px";
+            titleBar.style.textAlign = "center";
+            titleBar.style.marginBottom = "10px";
+            inputEl.parentElement.insertBefore(titleBar, inputEl);
 
 
-function getPatentProbability() {
-    const rows = document.querySelectorAll("table.css-105i9tf.ewa4lx20 tbody tr");
-    for (const row of rows) {
-        const label = row.querySelector("td:first-child")?.textContent?.trim();
-        if (label === "Patent probability") {
-            const valueText = row.querySelector("td:last-child")?.textContent?.trim();
-            if (!valueText) return null;
+            // (Patent Progress, Research Needed, Cash Needed, Patent Conversion)
 
-            // Match both numbers in the cell (e.g., "6.25% +3.94%")
-            const matches = [...valueText.matchAll(/([\d.]+)%?/g)];
-            if (matches.length === 0) return null;
 
-            // Sum all percentages found
-            let sum = 0;
-            matches.forEach(m => sum += parseFloat(m[1]));
-            console.log(sum);
-            return sum / 100; // convert to decimal
-        }
+            // --- Patent Conversion ---
+            const x = patentValueDict[result.itemId] || 0;
+            console.log("require: ",require);
+            console.log("cashNeeded: ",cashNeeded);
+            const patentConversion = ((total-patents) * x) - cashNeeded;
+            const patentConversionFormatted = Number(patentConversion).toLocaleString();
+
+            console.log("Progress raw:", result.progress);
+            console.log("Progress formatted:", progressFormatted);
+
+
+            // --- Display progress ---
+            const b = document.createElement("b");
+            b.textContent = `Patent Progress: ${progressFormatted}%`;
+            b.style.padding = '10px 5px';
+            b.style.display = 'block';
+            b.id = "patent-progress";
+            b.dataset.version = "2.1.4";
+            inputEl.parentElement.appendChild(b);
+
+            // --- Display research needed ---
+            const b2 = document.createElement("b");
+            b2.textContent = `Research Needed: ${requireFormatted}`;
+            b2.style.padding = '10px 5px';
+            b2.style.display = 'block';
+            inputEl.parentElement.appendChild(b2);
+
+            // --- Display cash needed ---
+            const b3 = document.createElement("b");
+            b3.textContent = `Cash Needed: $${cashNeededFormatted}`;
+            b3.style.padding = '10px 5px';
+            b3.style.display = 'block';
+            inputEl.parentElement.appendChild(b3);
+
+            // --- Display patent conversion ---
+            const b4 = document.createElement("b");
+            b4.textContent = `Patent Conversion: $${patentConversionFormatted}`;
+            b4.style.padding = '10px 5px';
+            b4.style.display = 'block';
+            b4.style.color = patentConversion >= 0 ? 'green' : 'red';
+            inputEl.parentElement.appendChild(b4);
+
+            // --- Add note at bottom ---
+            const note = document.createElement("div");
+            note.textContent = "All of these calculations are estimates. They may vary. If you have executives, visit the Executives page then return here.";
+            note.style.fontSize = "12px";
+            note.style.fontStyle = "italic";
+            note.style.marginTop = "10px";
+            inputEl.parentElement.appendChild(note);
+
+            return result;
+
+        }, 100); // check every 100ms until all elements and price exist
     }
-    return null;
-}
+
+
+    function getPatentProbability() {
+        const rows = document.querySelectorAll("table.css-105i9tf.ewa4lx20 tbody tr");
+        for (const row of rows) {
+            const label = row.querySelector("td:first-child")?.textContent?.trim();
+            if (label === "Patent probability") {
+                const valueText = row.querySelector("td:last-child")?.textContent?.trim();
+                if (!valueText) return null;
+
+                // Match both numbers in the cell (e.g., "6.25% +3.94%")
+                const matches = [...valueText.matchAll(/([\d.]+)%?/g)];
+                if (matches.length === 0) return null;
+
+                // Sum all percentages found
+                let sum = 0;
+                matches.forEach(m => sum += parseFloat(m[1]));
+                console.log(sum);
+                return sum / 100; // convert to decimal
+            }
+        }
+        return null;
+    }
 
 
 
     function auction() {
         const timer = setInterval (() => {
-        console.log("qtyInput....");
-        const qtyInput = document.querySelector('input.form-control[label="Bid"]');
-        if (!qtyInput) return;
-        console.log("qtyInput found");
+            console.log("qtyInput....");
+            const qtyInput = document.querySelector('input.form-control[label="Bid"]');
+            if (!qtyInput) return;
+            console.log("qtyInput found");
 
-        clearInterval(timer);
+            clearInterval(timer);
 
-        const priceElem = Array.from(document.querySelectorAll('.css-2pg1ps'));
+            const priceElem = Array.from(document.querySelectorAll('.css-2pg1ps'));
             if (priceElem) {
                 const price = priceElem.find(el => el.textContent.includes('$')).textContent.trim();
                 console.log(price);
@@ -1143,11 +1150,11 @@ function getPatentProbability() {
             }
 
 
-        const a = document.createElement("button");
-        a.textContent = `BYPASS BID`;
-        a.style.padding = "10px 5px";
-        a.onclick = () => setInput(qtyInput, realPrice);
-        qtyInput.parentElement.appendChild(a);
+            const a = document.createElement("button");
+            a.textContent = `BYPASS BID`;
+            a.style.padding = "10px 5px";
+            a.onclick = () => setInput(qtyInput, realPrice);
+            qtyInput.parentElement.appendChild(a);
         }, 100);
 
     }
