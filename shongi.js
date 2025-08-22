@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         SimCompanies Premium
 // @namespace    http://tampermonkey.net/
-// @version      3.3.2
+// @version      3.3.3
 // @description  Enhancements for SimCompanies web game. Complies with scripting rules of the game.
 // @author       Loki Clarke
 // @match        https://www.simcompanies.com/*
