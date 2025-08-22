@@ -1102,8 +1102,6 @@
             note.style.marginTop = "10px";
             inputEl.parentElement.appendChild(note);
 
-            console.log("hi");
-
             return result;
 
         }, 100); // check every 100ms until all elements and price exist
