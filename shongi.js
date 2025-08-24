@@ -528,7 +528,7 @@
                 const profitLow = ((price-source)*amount*.96).toFixed(3);
                 const profitHigh = ((price-source)*amount*ContractDiscount).toFixed(3);
                 const profitMargin = (profitLow/exchangeVal*100).toFixed(1);
-                span3.textContent = "Profit Range: $"+profitLow+" - $"+profitHigh+`‎ ‎ ‎ ‎ (% ${profitMargin} Profit)`;
+                span3.textContent = "Profit Range: $"+profitLow+" - $"+profitHigh+`‎ ‎ ‎ ‎ (${profitMargin}% Profit)`;
                 span3.style.fontSize = "16px";
                 span3.style.display = "block";
                 classArr[1].parentElement.appendChild(span3);
