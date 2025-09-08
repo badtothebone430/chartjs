@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         SimCompanies Premium
 // @namespace    http://tampermonkey.net/
-// @version      3.3.3
+// @version      3.3.4
 // @description  Enhancements for SimCompanies web game. Complies with scripting rules of the game.
 // @author       Loki Clarke
 // @match        https://www.simcompanies.com/*
@@ -1086,8 +1086,9 @@
             inputEl.parentElement.appendChild(b3);
 
             // --- Display patent conversion ---
+            console.log("patentConversion: ", patentConversion);
             const b4 = document.createElement("b");
-            b4.textContent = `Patent Conversion: $${patentConversionFormatted} (${(cashNeededFormatted/patentConversion*100)-100}% Margin)`;
+            b4.textContent = `Patent Conversion: $${patentConversionFormatted} (${(cashNeeded/patentConversion*100)-100}% Margin)`;
             b4.style.padding = '10px 5px';
             b4.style.display = 'block';
             b4.style.color = patentConversion >= 0 ? 'green' : 'red';
