@@ -20,6 +20,7 @@
     const CustomExchangeInputPrices = [10000]; // 交易所页面，自定义输入购买数量按钮
     const CustomProductionTimeInputs = ["9:15pm", "10pm", "6hr", "12hr","48hr","11am"]; // 生产页面，自定义输入生产时间按钮
     const ContractDiscount = 0.975; // 出售商品页面，合同MP价折扣
+    const ECONST = 1.00259235256;
     let realCash = 0;
     let realPrice = 0;
     let flag = 0;
@@ -995,7 +996,10 @@
             const priceMatch = buyMoreEl.textContent.match(/\(\$([\d.,]+)\)/);
             if (!priceMatch) return; // wait until price text exists
             result.exchangeValue = Number(priceMatch[1].replace(/,/g, ""));
-            result.exchangeValue *= 1.00259235256;
+
+            // --- Error correction for market price fluctation due to large volume ---
+            result.exchangeValue *= ECONST; 
+            
 
             // --- Item ID ---
             const hrefMatch = buyMoreEl.getAttribute("href").match(/\/market\/resource\/(\d+)\//);
