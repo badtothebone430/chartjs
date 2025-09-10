@@ -1101,6 +1101,7 @@
 
             // --- Add note at bottom ---
             const note = document.createElement("div");
+            console.log(temp);
             note.textContent = `All of these calculations are estimates. They may vary. If you have executives, visit the Executives page then return here. (${temp}% Margin)`;
             note.style.fontSize = "12px";
             note.style.fontStyle = "italic";
