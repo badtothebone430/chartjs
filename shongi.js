@@ -1093,7 +1093,7 @@
             console.log("patentConversion: ", patentConversion);
             const b4 = document.createElement("b");
             const temp = (cashNeeded/patentConversion*100)-100;
-            b4.textContent = `Patent Conversion: $${patentConversionFormatted} (${temp}% Margin)`;
+            b4.textContent = `Patent Conversion: $${patentConversionFormatted}`;
             b4.style.padding = '10px 5px';
             b4.style.display = 'block';
             b4.style.color = patentConversion >= 0 ? 'green' : 'red';
@@ -1101,7 +1101,7 @@
 
             // --- Add note at bottom ---
             const note = document.createElement("div");
-            note.textContent = "All of these calculations are estimates. They may vary. If you have executives, visit the Executives page then return here.";
+            note.textContent = `All of these calculations are estimates. They may vary. If you have executives, visit the Executives page then return here. (${temp}% Margin)`;
             note.style.fontSize = "12px";
             note.style.fontStyle = "italic";
             note.style.marginTop = "10px";
