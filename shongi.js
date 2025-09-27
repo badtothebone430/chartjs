@@ -1082,9 +1082,19 @@
             b2.style.display = 'block';
             inputEl.parentElement.appendChild(b2);
 
-            // --- Display cash needed ---
+            // --- Display cash needed and how much more is required vs current balance ---
             const b3 = document.createElement("b");
-            b3.textContent = `Cash Needed: $${cashNeededFormatted}`;
+            // cashNeeded is a string because of toFixed above; convert to number for math
+            const numericCashNeeded = parseFloat(cashNeeded);
+            // If realCash was set earlier from the page (same method as exchange handler), show difference
+            if (typeof realCash === 'number' && !isNaN(realCash)) {
+                const moreNeededVal = Math.max(0, numericCashNeeded - realCash);
+                const moreNeededFormatted = numberAddCommas(moreNeededVal.toFixed(2));
+                const balanceFormatted = numberAddCommas(realCash.toFixed(2));
+                b3.textContent = `Cash Needed: $${cashNeededFormatted} (Need $${moreNeededFormatted} more; Balance: $${balanceFormatted})`;
+            } else {
+                b3.textContent = `Cash Needed: $${cashNeededFormatted}`;
+            }
             b3.style.padding = '10px 5px';
             b3.style.display = 'block';
             inputEl.parentElement.appendChild(b3);
