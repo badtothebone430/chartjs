@@ -1091,7 +1091,7 @@
                 const moreNeededVal = Math.max(0, numericCashNeeded - realCash);
                 const moreNeededFormatted = numberAddCommas(moreNeededVal.toFixed(2));
                 const balanceFormatted = numberAddCommas(realCash.toFixed(2));
-                b3.textContent = `Cash Needed: $${cashNeededFormatted} (Need $${moreNeededFormatted} more; Balance: $${balanceFormatted})`;
+                b3.textContent = `Cash Needed: $${cashNeededFormatted} ( Need $${moreNeededFormatted} more )`;
             } else {
                 b3.textContent = `Cash Needed: $${cashNeededFormatted}`;
             }
