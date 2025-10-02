@@ -142,14 +142,10 @@
                         const json = JSON.parse(response.response);
                         const p = document.createElement("p");
                         let text =
-                            "Latest Price: $" +
-                            json.latest_price.toFixed(3) +
-                            "<br>Average: $" +
-                            json.prices_resume.average.toFixed(3) +
-                            "&nbsp;&nbsp;&nbsp;Max: $" +
-                            json.prices_resume.max.toFixed(3) +
-                            "&nbsp;&nbsp;&nbsp;Min: $" +
-                            json.prices_resume.min.toFixed(3);
+                            "Latest Price: $" + numberAddCommas(json.latest_price.toFixed(3)) +
+                            "<br>Average: $" + numberAddCommas(json.prices_resume.average.toFixed(3)) +
+                            "&nbsp;&nbsp;&nbsp;Max: $" + numberAddCommas(json.prices_resume.max.toFixed(3)) +
+                            "&nbsp;&nbsp;&nbsp;Min: $" + numberAddCommas(json.prices_resume.min.toFixed(3));
                         p.innerHTML = text;
                         p.style.fontSize = "18px";
                         container.insertBefore(p, container.firstChild);
@@ -403,17 +399,17 @@
                 console.log(realPrice);
             }
 
-            const price = Math.floor(realCash/realPrice);
-            const half = Math.floor(price/2);
+            const price = Math.floor(realCash / realPrice);
+            const half = Math.floor(price / 2);
 
             const c = document.createElement("a");
-            c.textContent = ` MAX: (${price})`;
+            c.textContent = ` MAX: (${numberAddCommas(price)})`;
             c.style.padding = "10px 5px";
             c.onclick = () => setInput(qtyInput, price);
             qtyInput.parentElement.parentElement.parentElement.appendChild(c);
 
             const b = document.createElement("a");
-            b.textContent = ` 50% (${half})`;
+            b.textContent = ` 50% (${numberAddCommas(half)})`;
             b.style.padding = "10px 5px";
             b.onclick = () => setInput(qtyInput, half);
             qtyInput.parentElement.parentElement.parentElement.appendChild(b);
@@ -497,18 +493,18 @@
             if(!flag){
                 console.log(flag);
                 const a = document.createElement('a');
-                a.textContent = 'MP: $'+ price;
+                a.textContent = 'MP: $' + numberAddCommas(Number(price).toFixed(3));
                 a.style.display = "block";
                 a.onclick = () => {setInput(input, price);}
                 input.parentElement.appendChild(a);
                 const a2 = document.createElement('a');
-                a2.textContent = '2.5%: $'+ price*ContractDiscount;
+                a2.textContent = '2.5%: $' + numberAddCommas((price * ContractDiscount).toFixed(3));
                 a2.style.display = "block";
                 a2.onclick = () => {setInput(input, price*ContractDiscount);}
                 input.parentElement.appendChild(a2);
                 const span = document.createElement('span');
-                const exchangeVal = (price*amount).toFixed(3);
-                span.textContent = "Exchange Value: $"+exchangeVal;
+                const exchangeVal = Number(price * amount).toFixed(3);
+                span.textContent = "Exchange Value: $" + numberAddCommas(exchangeVal);
                 span.style.fontSize = "16px";
                 span.style.padding = "10px 5px";
                 span.style.display = "block";
@@ -516,20 +512,20 @@
                 span.style.border = '1px solid white';
                 classArr[1].parentElement.appendChild(span);
                 const span4 = document.createElement('span');
-                span4.textContent = "Contract Value: $"+(price*amount*ContractDiscount).toFixed(3);
+                span4.textContent = "Contract Value: $" + numberAddCommas((price * amount * ContractDiscount).toFixed(3));
                 span4.style.fontSize = "16px";
                 span4.style.display = "block";
                 classArr[1].parentElement.appendChild(span4);
                 const span2 = document.createElement('span');
-                span2.textContent = "Total Cost: $"+(source*amount).toFixed(3);
+                span2.textContent = "Total Cost: $" + numberAddCommas((source * amount).toFixed(3));
                 span2.style.fontSize = "16px";
                 span2.style.display = "block";
                 classArr[1].parentElement.appendChild(span2);
                 const span3 = document.createElement('span');
-                const profitLow = ((price-source)*amount*.96).toFixed(3);
-                const profitHigh = ((price-source)*amount*ContractDiscount).toFixed(3);
-                const profitMargin = (profitLow/exchangeVal*100).toFixed(1);
-                span3.textContent = "Profit Range: $"+profitLow+" - $"+profitHigh+`‎ ‎ ‎ ‎ (${profitMargin}% Profit)`;
+                const profitLow = Number((price - source) * amount * 0.96).toFixed(3);
+                const profitHigh = Number((price - source) * amount * ContractDiscount).toFixed(3);
+                const profitMargin = ((Number(profitLow) / Number(exchangeVal)) * 100).toFixed(1);
+                span3.textContent = "Profit Range: $" + numberAddCommas(profitLow) + " - $" + numberAddCommas(profitHigh) + `‎ ‎ ‎ ‎ (${profitMargin}% Profit)`;
                 span3.style.fontSize = "16px";
                 span3.style.display = "block";
                 classArr[1].parentElement.appendChild(span3);
