@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         SimCompanies Premium
 // @namespace    http://tampermonkey.net/
-// @version      3.4.4
+// @version      3.4.6
 // @description  Enhancements for SimCompanies web game. Complies with scripting rules of the game.
 // @author       Loki Clarke
 // @match        https://www.simcompanies.com/*
@@ -1093,23 +1093,33 @@
                     case 'z': // CTO Apprentice
                         ctoApprenticeSkill = exec.skills.cto;
                         break;
-                    case 'o': // COO (main only)
-                    case 'f': // CFO (main only)
-                    case 'm': // CMO (main only)
-                        // Only include main executives, not apprentices
-                        if (!['v', 'x', 'y'].includes(exec.currentWorkHistory.position)) {
-                            otherExecSkills += exec.skills.cto;
-                        }
+                    case 'o': // COO Louganis
+                    case 'f': // CFO Lipa
+                    case 'm': // CMO Sandberg
+                        // Only these specific positions count for other execs
+                        otherExecSkills += exec.skills.cto;
                         break;
                 }
             });
 
-            // Calculate total CTO skill
-            const totalCtoSkill = ctoSkill + (ctoApprenticeSkill * 0.5) + (otherExecSkills * 0.25);
+            // Calculate raw total CTO skill
+            const rawTotalCtoSkill = ctoSkill + (ctoApprenticeSkill * 0.5) + (otherExecSkills * 0.25);
+            
+            // Apply soft cap
+            let effectiveTotalSkill = 0;
+            if (rawTotalCtoSkill <= 60) {
+                effectiveTotalSkill = rawTotalCtoSkill;
+            } else if (rawTotalCtoSkill <= 80) {
+                effectiveTotalSkill = 60 + (rawTotalCtoSkill - 60) * 0.5;
+            } else {
+                effectiveTotalSkill = 60 + (20 * 0.5) + (rawTotalCtoSkill - 80) * 0.25;
+            }
             
             // Calculate patent probability: (1 + Total CTO Skill/100) * 6.25%
-            const patentProbability = (1 + totalCtoSkill / 100) * 0.0625;
+            const patentProbability = (1 + effectiveTotalSkill / 100) * 0.0625;
             
+            console.log('Raw Total CTO Skill:', rawTotalCtoSkill);
+            console.log('Effective Total CTO Skill (after cap):', effectiveTotalSkill);
             console.log('Patent Probability:', patentProbability);
             return patentProbability;
         } catch (error) {
