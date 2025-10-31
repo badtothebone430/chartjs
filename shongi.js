@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         SimCompanies Premium
 // @namespace    http://tampermonkey.net/
-// @version      3.4.2
+// @version      3.4.3
 // @description  Enhancements for SimCompanies web game. Complies with scripting rules of the game.
 // @author       Loki Clarke
 // @match        https://www.simcompanies.com/*
@@ -90,10 +90,11 @@
             handleCustomHourInput();
         } else if (currentURL.includes("/headquarters/executives/")) {
             // On the probability page
-            const patentChance = getPatentProbability(); // from previous function
-            if (patentChance !== null) {
-                localStorage.setItem("patentProbability", patentChance);
-            }
+            getPatentProbability().then(patentChance => {
+                if (patentChance !== null) {
+                    localStorage.setItem("patentProbability", patentChance);
+                }
+            });
 
         } else if (currentURL.includes("/market/resource/")) {
             // 交易所 高亮6件最近访问物品
@@ -902,11 +903,21 @@
         const timer = setInterval(() => {
             const result = { patents: 0, total: 0, progress: 0, exchangeValue: null, itemId: null, chance: 0.0625 };
 
+            // Get stored chance or calculate it directly
             const storedChance = parseFloat(localStorage.getItem("patentProbability"));
             if (!storedChance || isNaN(storedChance)) {
-                alert("Please visit the Executives page first to load the patent probability.");
-                result.chance = 0.0625; // fallback base value
-                window.location.href = "https://www.simcompanies.com/headquarters/executives/";
+                // Calculate probability directly
+                getPatentProbability().then(patentChance => {
+                    if (patentChance !== null) {
+                        result.chance = patentChance;
+                        localStorage.setItem("patentProbability", patentChance);
+                        // Refresh calculations with new probability
+                        const event = new Event('input', { bubbles: true });
+                        inputEl.dispatchEvent(event);
+                    } else {
+                        result.chance = 0.0625; // fallback if calculation fails
+                    }
+                });
             } else {
                 result.chance = storedChance;
             }
@@ -1064,26 +1075,44 @@
     }
 
 
-    function getPatentProbability() {
-        const rows = document.querySelectorAll("table.css-105i9tf.ewa4lx20 tbody tr");
-        for (const row of rows) {
-            const label = row.querySelector("td:first-child")?.textContent?.trim();
-            if (label === "Patent probability") {
-                const valueText = row.querySelector("td:last-child")?.textContent?.trim();
-                if (!valueText) return null;
+    async function getPatentProbability() {
+        try {
+            const response = await fetch('https://www.simcompanies.com/api/v3/companies/me/executives/');
+            const data = await response.json();
+            
+            let ctoSkill = 0;
+            let ctoApprenticeSkill = 0;
+            let otherExecSkills = 0;
 
-                // Match both numbers in the cell (e.g., "6.25% +3.94%")
-                const matches = [...valueText.matchAll(/([\d.]+)%?/g)];
-                if (matches.length === 0) return null;
+            // Process executives based on their positions
+            data.executives.forEach(exec => {
+                switch(exec.currentWorkHistory.position) {
+                    case 't': // CTO
+                        ctoSkill = exec.skills.cto;
+                        break;
+                    case 'z': // CTO Apprentice
+                        ctoApprenticeSkill = exec.skills.cto;
+                        break;
+                    case 'o': // COO
+                    case 'f': // CFO
+                    case 'm': // CMO
+                        otherExecSkills += exec.skills.cto;
+                        break;
+                }
+            });
 
-                // Sum all percentages found
-                let sum = 0;
-                matches.forEach(m => sum += parseFloat(m[1]));
-                console.log(sum);
-                return sum / 100; // convert to decimal
-            }
+            // Calculate total CTO skill
+            const totalCtoSkill = ctoSkill + (ctoApprenticeSkill * 0.5) + (otherExecSkills * 0.25);
+            
+            // Calculate patent probability: (Total CTO Skill/100) * 6.25%
+            const patentProbability = (totalCtoSkill / 100) * 0.0625;
+            
+            console.log('Patent Probability:', patentProbability);
+            return patentProbability;
+        } catch (error) {
+            console.error('Error fetching executives:', error);
+            return null;
         }
-        return null;
     }
 
 
