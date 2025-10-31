@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         SimCompanies Premium
 // @namespace    http://tampermonkey.net/
-// @version      3.4.6
+// @version      3.4.7
 // @description  Enhancements for SimCompanies web game. Complies with scripting rules of the game.
 // @author       Loki Clarke
 // @match        https://www.simcompanies.com/*
@@ -1105,14 +1105,14 @@
             // Calculate raw total CTO skill
             const rawTotalCtoSkill = ctoSkill + (ctoApprenticeSkill * 0.5) + (otherExecSkills * 0.25);
             
-            // Apply soft cap
+            // Apply soft cap and floor
             let effectiveTotalSkill = 0;
             if (rawTotalCtoSkill <= 60) {
-                effectiveTotalSkill = rawTotalCtoSkill;
+                effectiveTotalSkill = Math.floor(rawTotalCtoSkill);
             } else if (rawTotalCtoSkill <= 80) {
-                effectiveTotalSkill = 60 + (rawTotalCtoSkill - 60) * 0.5;
+                effectiveTotalSkill = Math.floor(60 + (rawTotalCtoSkill - 60) * 0.5);
             } else {
-                effectiveTotalSkill = 60 + (20 * 0.5) + (rawTotalCtoSkill - 80) * 0.25;
+                effectiveTotalSkill = Math.floor(60 + (20 * 0.5) + (rawTotalCtoSkill - 80) * 0.25);
             }
             
             // Calculate patent probability: (1 + Total CTO Skill/100) * 6.25%
