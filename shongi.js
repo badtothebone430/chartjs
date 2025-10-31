@@ -5,7 +5,6 @@
 // @description  Enhancements for SimCompanies web game. Complies with scripting rules of the game.
 // @author       Loki Clarke
 // @match        https://www.simcompanies.com/*
-// @require      https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js
 // @grant        GM_addStyle
 // @grant        GM_xmlhttpRequest
 // @connect      simcotools.app
@@ -179,14 +178,15 @@
                                     dataOneMonth.push(dataThreeMonths[i]);
                                 }
 
+                                // Chart display disabled (Chart.js removed). Show textual placeholder instead.
                                 const div = document.createElement("div");
                                 div.style.width = "100%";
                                 div.style.height = "240px";
-                                const canvas = document.createElement("canvas");
-                                canvas.id = "script_market_canvas";
-                                div.appendChild(canvas);
+                                const noteP = document.createElement("p");
+                                noteP.textContent = "Chart display disabled.";
+                                noteP.style.fontSize = "16px";
+                                div.appendChild(noteP);
                                 container.appendChild(div);
-                                buildChart(canvas, [dataOneDay, dataOneMonth, dataThreeMonths]);
                             },
                         });
                     },
@@ -197,64 +197,8 @@
     }
 
     function buildChart(canvas, data) {
-        new Chart(canvas, {
-            type: "line",
-            data: {
-                datasets: [
-                    {
-                        label: "1 Day",
-                        data: data[0],
-                        pointRadius: 0,
-                    },
-                    {
-                        label: "1 Month",
-                        data: data[1],
-                        pointRadius: 0,
-                        hidden: true,
-                    },
-                    {
-                        label: "3 Months",
-                        data: data[2],
-                        pointRadius: 0,
-                        hidden: true,
-                    },
-                ],
-            },
-            options: {
-                parsing: {
-                    xAxisKey: "date",
-                    yAxisKey: "average",
-                },
-                scales: {
-                    x: {
-                        type: "time",
-                        time: {
-                            tooltipFormat: "yyyy/MM/dd HH:mm",
-                            displayFormats: {
-                                day: "MM/dd",
-                            },
-                        },
-                    },
-                },
-                plugins: {
-                    legend: {
-                        onClick: (e, legendItem, legend) => {
-                            let index = legendItem.datasetIndex;
-                            let ci = legend.chart;
-                            ci.data.datasets.forEach(function (e, i) {
-                                let meta = ci.getDatasetMeta(i);
-                                if (i !== index) {
-                                    meta.hidden = true;
-                                } else {
-                                    meta.hidden = false;
-                                }
-                            });
-                            ci.update();
-                        },
-                    },
-                },
-            },
-        });
+        // Chart.js removed — no-op placeholder to avoid runtime errors if called from commented code.
+        return;
     }
 
     function handleProfilePage() {
@@ -690,11 +634,12 @@
                                 const div = document.createElement("div");
                                 div.style.width = "100%";
                                 div.style.height = "240px";
-                                const canvas = document.createElement("canvas");
-                                canvas.id = "script_market_canvas";
-                                div.appendChild(canvas);
+                                const noteP = document.createElement("p");
+                                noteP.textContent = "Chart display disabled.";
+                                noteP.style.fontSize = "16px";
+                                div.appendChild(noteP);
                                 container.appendChild(div);
-                                buildChart(canvas, [dataOneDay, dataOneMonth, dataThreeMonths]);
+                                // buildChart removed
                             },
                         });
                     },
@@ -864,12 +809,7 @@
             max-width: 400px;
             max-height: 600px;
         }`);
-        GM_addStyle(`
-        div#script_market_container {
-            width: 100%;
-            height: 300px;
-            background-color: #B2D7DA;
-        }`);
+        // Chart container styling removed since Chart.js features disabled
         GM_addStyle(`
         a.css-s50znf > div.css-xgljd5 {
             visibility: hidden;
