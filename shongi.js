@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         SimCompanies Premium
 // @namespace    http://tampermonkey.net/
-// @version      3.4.3
+// @version      3.4.4
 // @description  Enhancements for SimCompanies web game. Complies with scripting rules of the game.
 // @author       Loki Clarke
 // @match        https://www.simcompanies.com/*
@@ -1093,10 +1093,13 @@
                     case 'z': // CTO Apprentice
                         ctoApprenticeSkill = exec.skills.cto;
                         break;
-                    case 'o': // COO
-                    case 'f': // CFO
-                    case 'm': // CMO
-                        otherExecSkills += exec.skills.cto;
+                    case 'o': // COO (main only)
+                    case 'f': // CFO (main only)
+                    case 'm': // CMO (main only)
+                        // Only include main executives, not apprentices
+                        if (!['v', 'x', 'y'].includes(exec.currentWorkHistory.position)) {
+                            otherExecSkills += exec.skills.cto;
+                        }
                         break;
                 }
             });
@@ -1104,8 +1107,8 @@
             // Calculate total CTO skill
             const totalCtoSkill = ctoSkill + (ctoApprenticeSkill * 0.5) + (otherExecSkills * 0.25);
             
-            // Calculate patent probability: (Total CTO Skill/100) * 6.25%
-            const patentProbability = (totalCtoSkill / 100) * 0.0625;
+            // Calculate patent probability: (1 + Total CTO Skill/100) * 6.25%
+            const patentProbability = (1 + totalCtoSkill / 100) * 0.0625;
             
             console.log('Patent Probability:', patentProbability);
             return patentProbability;
